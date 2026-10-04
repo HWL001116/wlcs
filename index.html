@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>五路财神 · 财运体质测试</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{min-height:100%;}
+body{
+  font-family:"Songti SC","STSong","KaiTi","楷体","Noto Serif SC",serif;
+  background:#0a0503;color:#EFDFC0;
+  display:flex;justify-content:center;
+  padding:40px 18px 72px;position:relative;overflow-x:hidden;
+  line-height:1.75;-webkit-font-smoothing:antialiased;
+}
+body::before{
+  content:"";position:fixed;inset:0;z-index:-2;
+  background:
+    radial-gradient(ellipse 70% 45% at 50% -8%,rgba(224,167,46,.20),transparent 60%),
+    radial-gradient(ellipse 55% 38% at 50% 108%,rgba(120,22,22,.26),transparent 62%),
+    radial-gradient(circle at 50% 38%,#241206 0%,#120902 55%,#080302 100%);
+}
+body::after{
+  content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background-image:
+    linear-gradient(rgba(224,167,46,.045) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(224,167,46,.045) 1px,transparent 1px);
+  background-size:52px 52px;
+  -webkit-mask-image:radial-gradient(circle at 50% 22%,#000 0%,transparent 70%);
+  mask-image:radial-gradient(circle at 50% 22%,#000 0%,transparent 70%);
+}
+.wrap{width:100%;max-width:680px;position:relative;}
+.frame{
+  position:fixed;inset:14px;z-index:-1;pointer-events:none;
+  border:1px solid rgba(224,167,46,.16);border-radius:4px;
+}
+.frame::before,.frame::after{
+  content:"";position:absolute;width:26px;height:26px;
+  border:1px solid rgba(224,167,46,.45);
+}
+.frame::before{top:-1px;left:-1px;border-right:none;border-bottom:none;}
+.frame::after{bottom:-1px;right:-1px;border-left:none;border-top:none;}
+
+.screen{display:none;}
+.screen.active{display:block;animation:fadeUp .5s cubic-bezier(.22,1,.36,1) both;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:translateY(0);}}
+
+.gold-text{
+  background:linear-gradient(178deg,#FFF9E0 0%,#FFE08A 34%,#E0A72E 68%,#9E6B0C 100%);
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;color:transparent;
+}
+
+/* ===== 开始页 ===== */
+.start-box{text-align:center;padding-top:14px;}
+.kicker{font-size:11px;letter-spacing:9px;color:#A8834A;margin-bottom:26px;padding-left:9px;opacity:.9;}
+.kicker i{display:inline-block;width:22px;height:1px;vertical-align:middle;
+  background:linear-gradient(90deg,transparent,#A8834A);margin:0 10px 3px;}
+.kicker i:last-child{background:linear-gradient(90deg,#A8834A,transparent);}
+h1.main-title{font-size:clamp(40px,11vw,62px);letter-spacing:12px;line-height:1.15;font-weight:700;text-indent:12px;}
+.sub-title{margin-top:18px;font-size:clamp(12px,3.4vw,14px);color:#B99A5E;letter-spacing:4px;text-indent:4px;}
+
+.god-row{display:flex;justify-content:center;gap:4px;margin:44px 0 32px;flex-wrap:nowrap;}
+.god-chip{width:66px;display:flex;flex-direction:column;align-items:center;gap:5px;}
+.god-chip .god-svg{width:56px;height:60px;}
+.chip-line{width:20px;height:2px;border-radius:1px;margin-top:1px;}
+.chip-el{font-size:8.5px;color:#8A7048;letter-spacing:1.5px;line-height:1;}
+.chip-name{font-size:10.5px;color:#B99A5E;letter-spacing:1px;line-height:1;}
+
+.intro{font-size:14px;color:#9C8258;line-height:2.25;margin-bottom:44px;letter-spacing:1.2px;}
+.intro em{font-style:normal;color:#D8C49A;}
+.btn-gold{
+  font-family:inherit;font-size:16px;letter-spacing:7px;
+  padding:16px 52px;border:none;border-radius:2px;text-indent:7px;
+  background:linear-gradient(178deg,#FFF3CC 0%,#FFD05A 40%,#C98A18 100%);
+  color:#26150A;font-weight:700;cursor:pointer;position:relative;
+  box-shadow:0 8px 30px rgba(224,167,46,.32),inset 0 1px 0 rgba(255,255,255,.75);
+  transition:transform .2s ease,box-shadow .2s ease;
+}
+.btn-gold::after{content:"";position:absolute;inset:3px;border:1px solid rgba(38,21,10,.22);border-radius:1px;pointer-events:none;}
+.btn-gold:hover{transform:translateY(-2px);box-shadow:0 14px 40px rgba(224,167,46,.48),inset 0 1px 0 rgba(255,255,255,.9);}
+.btn-gold:active{transform:translateY(0) scale(.985);}
+
+/* ===== 答题页 ===== */
+.quiz-head{display:flex;justify-content:space-between;align-items:baseline;
+  font-size:11.5px;color:#A8834A;letter-spacing:2.5px;margin-bottom:14px;padding:0 2px;}
+.progress-track{height:2px;background:rgba(224,167,46,.13);margin-bottom:40px;position:relative;}
+.progress-fill{height:100%;width:10%;
+  background:linear-gradient(90deg,#8A5F0B,#FFD86B,#FFF9E0);
+  box-shadow:0 0 14px rgba(255,216,107,.7);
+  transition:width .4s cubic-bezier(.4,0,.2,1);}
+.q-text{font-size:clamp(18px,4.6vw,22px);line-height:1.8;
+  color:#F6E7C4;font-weight:600;letter-spacing:1px;margin-bottom:30px;min-height:3.6em;}
+.options{display:flex;flex-direction:column;gap:11px;margin-bottom:32px;}
+.option{
+  font-family:inherit;text-align:left;font-size:14.5px;line-height:1.65;
+  color:#E0CFA8;padding:17px 20px 17px 58px;border-radius:2px;
+  cursor:pointer;position:relative;
+  background:linear-gradient(180deg,rgba(224,167,46,.075),rgba(224,167,46,.015));
+  border:1px solid rgba(224,167,46,.22);
+  transition:all .22s ease;
+}
+.option::before{
+  content:attr(data-label);position:absolute;left:20px;top:50%;
+  transform:translateY(-50%);width:22px;height:22px;
+  display:grid;place-items:center;font-size:11.5px;font-weight:700;
+  color:#D8A63A;border:1px solid rgba(224,167,46,.4);
+  border-radius:50%;transition:all .22s ease;
+}
+.option:hover{border-color:rgba(255,216,107,.65);transform:translateX(4px);
+  background:linear-gradient(180deg,rgba(255,216,107,.15),rgba(224,167,46,.04));
+  box-shadow:0 0 26px rgba(224,167,46,.14);}
+.option.chosen{border-color:#FFD86B;
+  background:linear-gradient(180deg,rgba(255,216,107,.24),rgba(224,167,46,.08));
+  box-shadow:0 0 30px rgba(255,216,107,.26);}
+.option.chosen::before{background:linear-gradient(178deg,#FFE9A8,#D89A22);color:#2A1608;border-color:transparent;}
+.btn-ghost{font-family:inherit;font-size:12px;letter-spacing:3px;color:#8A7048;
+  background:none;border:none;cursor:pointer;padding:6px 0;transition:color .22s;}
+.btn-ghost:hover:not(:disabled){color:#E0A72E;}
+.btn-ghost:disabled{opacity:.18;cursor:default;}
+
+/* ===== 结果页 ===== */
+.result-top{text-align:center;margin-bottom:46px;}
+.result-label{font-size:11px;letter-spacing:9px;color:#A8834A;margin-bottom:22px;padding-left:9px;}
+.result-name{font-size:clamp(38px,10vw,56px);letter-spacing:10px;font-weight:700;text-indent:10px;line-height:1.15;}
+.result-sub{font-size:14px;color:#B99A5E;letter-spacing:5px;margin-top:16px;text-indent:5px;}
+.score-pill{display:inline-block;margin-top:26px;padding:9px 28px;
+  font-size:12px;letter-spacing:3px;color:#E0A72E;
+  border:1px solid rgba(224,167,46,.35);
+  background:rgba(224,167,46,.05);border-radius:1px;}
+.section-title{font-size:11.5px;letter-spacing:7px;color:#A8834A;
+  text-align:center;margin:0 0 26px;padding-left:7px;}
+.section-title i{display:inline-block;width:30px;height:1px;vertical-align:middle;
+  background:linear-gradient(90deg,transparent,rgba(168,131,74,.6));margin:0 12px 3px;}
+.section-title i:last-child{background:linear-gradient(90deg,rgba(168,131,74,.6),transparent);}
+.god-cards{display:flex;flex-direction:column;gap:16px;margin-bottom:44px;}
+
+.god-card{
+  display:flex;gap:18px;padding:22px 20px;border-radius:2px;
+  position:relative;overflow:hidden;
+  box-shadow:0 10px 34px rgba(0,0,0,.45);
+  animation:fadeUp .55s cubic-bezier(.22,1,.36,1) both;
+}
+.god-card:nth-child(2){animation-delay:.14s;}
+.god-card::after{
+  content:"";position:absolute;top:-60%;right:-14%;
+  width:160px;height:160px;pointer-events:none;
+  background:radial-gradient(circle,var(--gc-soft),transparent 68%);
+}
+.god-card .god-svg{flex:0 0 88px;width:88px;height:96px;}
+.g-body{flex:1;min-width:0;padding-top:2px;}
+
+.g-name-row{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;}
+.g-name{font-size:19px;font-weight:700;letter-spacing:4px;line-height:1.3;}
+.g-el{
+  font-size:9.5px;letter-spacing:2px;padding:2px 8px 1px;
+  border:1px solid;border-radius:1px;line-height:1.5;white-space:nowrap;
+}
+.g-title{font-size:11px;color:#A8834A;letter-spacing:1.2px;margin-top:8px;line-height:1.7;}
+.g-power{font-size:12px;color:#D8A63A;margin-top:10px;letter-spacing:1px;line-height:1.7;}
+.g-why{font-size:13.5px;color:#C9B491;line-height:2;margin-top:13px;padding-top:13px;
+  border-top:1px solid rgba(224,167,46,.14);}
+
+.advice-box{padding:26px 24px;border-radius:2px;margin-bottom:46px;
+  border:1px solid rgba(224,167,46,.18);
+  background:linear-gradient(180deg,rgba(224,167,46,.055),rgba(0,0,0,.2));}
+.advice-box h3{font-size:12px;letter-spacing:6px;color:#FFD86B;margin-bottom:20px;font-weight:600;padding-left:6px;}
+.advice-box li{font-size:13.5px;color:#C9B491;line-height:2;margin-bottom:14px;padding-left:20px;
+  position:relative;list-style:none;}
+.advice-box li:last-child{margin-bottom:0;}
+.advice-box li::before{content:"";position:absolute;left:0;top:11px;width:6px;height:6px;
+  background:linear-gradient(135deg,#FFD86B,#A8730F);transform:rotate(45deg);}
+.center{text-align:center;}
+.footer-note{text-align:center;font-size:11px;color:#6E5A3E;letter-spacing:2.5px;margin-top:28px;line-height:2.1;}
+
+/* ===== 财神 SVG 动画 ===== */
+.god-svg{display:block;overflow:visible;}
+.god-svg .ring{transform-origin:60px 55px;transform-box:view-box;animation:spin 32s linear infinite;}
+.god-svg .ring-fast{animation-duration:18s;}
+.god-svg .ring-slow{animation-duration:44s;}
+.god-svg .halo{animation:breathe 5.5s ease-in-out infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+@keyframes breathe{0%,100%{opacity:.55;}50%{opacity:1;}}
+
+/* 赵公明 · 红缨摇曳 */
+.god-svg .tassel{transform-origin:60px 16px;transform-box:view-box;animation:tasselSway 3s ease-in-out infinite;}
+@keyframes tasselSway{0%,100%{transform:rotate(-9deg);}50%{transform:rotate(9deg);}}
+
+/* 曹宝 · 宝珠呼吸 */
+.god-svg .pearl{transform-origin:60px 104px;transform-box:view-box;animation:pearlGlow 4s ease-in-out infinite;}
+.god-svg .pearl-core{transform-origin:60px 104px;transform-box:view-box;animation:pearlGlow 4s ease-in-out infinite .6s;}
+@keyframes pearlGlow{0%,100%{opacity:.4;transform:scale(.94);}50%{opacity:1;transform:scale(1.1);}}
+
+/* 萧升 · 金光上涌 */
+.god-svg .basin-glow{animation:breathe 3.5s ease-in-out infinite;}
+.god-svg .rise{animation:riseUp 2.4s ease-out infinite;}
+.god-svg .r2{animation-delay:.8s;}
+.god-svg .r3{animation-delay:1.6s;}
+@keyframes riseUp{0%{transform:translateY(0);opacity:.85;}100%{transform:translateY(-14px);opacity:0;}}
+
+/* 陈九公 · 铜钱旋转 */
+.god-svg .coin{transform-box:fill-box;transform-origin:center;animation:coinSpin 7s linear infinite;}
+.god-svg .c2{animation-delay:-2.3s;}
+.god-svg .c3{animation-delay:-4.6s;}
+@keyframes coinSpin{to{transform:rotate(360deg);}}
+
+/* 姚少司 · 算盘珠滑动 */
+.god-svg .bead{transform-box:fill-box;animation:beadSlide 2.4s ease-in-out infinite;}
+.god-svg .b2{animation-delay:-.15s;}
+.god-svg .b3{animation-delay:-.3s;}
+.god-svg .b4{animation-delay:-.45s;}
+.god-svg .b5{animation-delay:-.6s;}
+.god-svg .b6{animation-delay:-.75s;}
+.god-svg .b7{animation-delay:-.9s;}
+.god-svg .b8{animation-delay:-1.05s;}
+.god-svg .b9{animation-delay:-1.2s;}
+.god-svg .b10{animation-delay:-1.35s;}
+@keyframes beadSlide{0%,100%{transform:translateX(0);}50%{transform:translateX(3.2px);}}
+
+.god-svg .sparkle{animation:sparkle 2.8s ease-in-out infinite;}
+.god-svg .s2{animation-delay:.9s;}
+.god-svg .s3{animation-delay:1.8s;}
+@keyframes sparkle{0%,100%{opacity:.15;}50%{opacity:.9;}}
+</style>
+</head>
+<body>
+
+<div class="frame"></div>
+
+<div class="wrap">
+
+  <!-- ================= 开始页 ================= -->
+  <section id="screen-start" class="screen active">
+    <div class="start-box">
+      <div class="kicker"><i></i>五 路 财 神<i></i></div>
+      <h1 class="main-title gold-text">财运体质</h1>
+      <p class="sub-title">你是守财型，还是容易散财</p>
+
+      <div class="god-row" id="god-row"></div>
+
+      <p class="intro">
+        财神不入急门，也不进漏门。<br>
+        十道题，看看你身上的财气<br>
+        是<em>「守」</em>得住，还是<em>「散」</em>得快。
+      </p>
+
+      <button class="btn-gold" onclick="startQuiz()">开 始 测 试</button>
+    </div>
+  </section>
+
+  <!-- ================= 答题页 ================= -->
+  <section id="screen-quiz" class="screen">
+    <div class="quiz-head">
+      <span id="q-index">第 1 / 10 题</span>
+      <span>凭第一反应作答</span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+    <h2 class="q-text" id="q-text"></h2>
+    <div class="options" id="options"></div>
+    <button class="btn-ghost" id="btn-back" onclick="prevQuestion()">← 上 一 题</button>
+  </section>
+
+  <!-- ================= 结果页 ================= -->
+  <section id="screen-result" class="screen">
+    <div class="result-top">
+      <div class="result-label">你 的 财 运 体 质</div>
+      <div class="result-name gold-text" id="result-name"></div>
+      <div class="result-sub" id="result-sub"></div>
+      <div class="score-pill" id="score-line"></div>
+    </div>
+
+    <div class="section-title"><i></i>本 命 财 神 组 合<i></i></div>
+    <div class="god-cards" id="god-cards"></div>
+
+    <div class="advice-box">
+      <h3>给 你 的 三 条 建 议</h3>
+      <ul id="advice-list"></ul>
+    </div>
+
+    <div class="center">
+      <button class="btn-gold" onclick="restart()">再 测 一 次</button>
+      <p class="footer-note">财神偏爱有准备的人<br>愿 你 财 库 常 满</p>
+    </div>
+  </section>
+
+</div>
+
+<script>
+/* ============================================================
+   五路财神 · 按五行方位排列
+   东木 · 南火 · 中土 · 西金 · 北水
+   ============================================================ */
+
+const GODS = {
+  /* 东 · 木 · 青碧 */
+  xiao: {
+    name:'萧升', element:'木', dir:'东',
+    light:'#C8F5DC', main:'#5FB894', dark:'#2E7A5C', accent:'#A8E6C8',
+    title:'东路招宝天尊 · 东方属木',
+    power:'主招宝进财 · 开财路、引机会'
+  },
+  /* 南 · 火 · 赤红 */
+  chen: {
+    name:'陈九公', element:'火', dir:'南',
+    light:'#FFC8B0', main:'#E0604A', dark:'#8A2A1A', accent:'#FF8A6A',
+    title:'南路招财使者 · 南方属火',
+    power:'主流通生财 · 走动招财、和气来财'
+  },
+  /* 中 · 土 · 明黄 */
+  zhao: {
+    name:'赵公明', element:'土', dir:'中',
+    light:'#FFE9A8', main:'#E0A72E', dark:'#8A5F0B', accent:'#C0392B',
+    title:'中路武财神 · 中央属土',
+    power:'掌人间财库 · 主正财、守成、镇宅'
+  },
+  /* 西 · 金 · 素白 */
+  cao: {
+    name:'曹宝', element:'金', dir:'西',
+    light:'#FFFFFF', main:'#D8D8D0', dark:'#8A8A80', accent:'#F0EDE4',
+    title:'西路纳珍天尊 · 西方属金',
+    power:'主收纳珍宝 · 归拢财库、不漏不散'
+  },
+  /* 北 · 水 · 玄蓝 */
+  yao: {
+    name:'姚少司', element:'水', dir:'北',
+    light:'#C0DEF8', main:'#5A8FD0', dark:'#2A4A80', accent:'#8FC0F0',
+    title:'北路利市仙官 · 北方属水',
+    power:'主利市交易 · 细水长流、稳中得利'
+  }
+};
+
+/* 页面展示顺序：东 → 南 → 中 → 西 → 北 */
+const GOD_ORDER = ['xiao', 'chen', 'zhao', 'cao', 'yao'];
+
+const QUESTIONS = [
+  { q:'发工资 / 生活费到账后，你第一件事通常是？',
+    opts:[ {t:'先转出一部分存起来', s:2},
+           {t:'先列必要开销，再看剩多少', s:1},
+           {t:'先买想买的东西，后面再说', s:0} ] },
+  { q:'看到「限时打折」时，你会？',
+    opts:[ {t:'不需要就不买，再便宜也不心动', s:2},
+           {t:'本来就要买，就趁活动入手', s:1},
+           {t:'容易因为便宜而多买', s:0} ] },
+  { q:'朋友向你借钱，或人情往来时，你通常？',
+    opts:[ {t:'有明确底线，不太轻易借出', s:2},
+           {t:'看关系和金额，量力而行', s:1},
+           {t:'不好意思拒绝，常让自己吃亏', s:0} ] },
+  { q:'突然收到一笔意外之财，你会？',
+    opts:[ {t:'大部分存起来或还债', s:2},
+           {t:'一部分存，一部分花', s:1},
+           {t:'很快花掉，买平时舍不得的', s:0} ] },
+  { q:'你有记账或盘点收支的习惯吗？',
+    opts:[ {t:'有，长期记录，清楚钱去哪了', s:2},
+           {t:'偶尔记，主要记大额支出', s:1},
+           {t:'几乎不记，花完才知道', s:0} ] },
+  { q:'面对「高收益」投资机会，你会？',
+    opts:[ {t:'很谨慎，本金安全优先', s:2},
+           {t:'小部分试水，能承受亏损', s:1},
+           {t:'容易心动，想多投一点', s:0} ] },
+  { q:'网购或逛街时，你的购物车通常？',
+    opts:[ {t:'只买清单内的', s:2},
+           {t:'清单为主，偶尔加一两样', s:1},
+           {t:'经常买计划外的东西', s:0} ] },
+  { q:'心情不好时，你会靠花钱缓解吗？',
+    opts:[ {t:'很少，会找其他方式', s:2},
+           {t:'偶尔买点小东西安慰自己', s:1},
+           {t:'经常报复性消费', s:0} ] },
+  { q:'你使用信用卡、花呗或分期吗？',
+    opts:[ {t:'很少用，用了也尽快还清', s:2},
+           {t:'会用，但控制在能还范围内', s:1},
+           {t:'常分期或最低还款，先花再说', s:0} ] },
+  { q:'对未来的财务安排，你更接近？',
+    opts:[ {t:'有明确储蓄目标和计划', s:2},
+           {t:'有大致方向，执行看情况', s:1},
+           {t:'没计划，走一步看一步', s:0} ] }
+];
+
+const RESULTS = {
+  keeper: {
+    name:'守财型',
+    sub:'财 库 深 锁 · 稳 字 当 头',
+    gods:[
+      { id:'zhao',
+        why:'你天生带着「财库」意识：钱到手，第一反应是留住，而不是花掉。这份定力，正是赵公明的底色——中路土德，掌人间财库，五路财神之首，管的恰恰就是那座库的门。' },
+      { id:'cao',
+        why:'但守财的人容易「只守不纳」：零散的进项、被忽略的小钱、躺在活期里睡大觉的存款，往往没被归拢。曹宝居西属金，主「纳珍入库」，专管把好东西一件件收进库里——他提醒你：守得住，还要收得全。' }
+    ],
+    advice:[
+      '每月固定拿出收入的 5%—10% 作为「快乐预算」，专款专用，花完为止，不用心疼。',
+      '应急金留够 6 个月开支之后，剩下的钱别只放活期，学点低风险理财，让钱动起来。',
+      '该花的钱（健康、学习、人情）不要省——过度紧缩，往往会让你错过更值钱的机会。'
+    ]
+  },
+  balanced: {
+    name:'平衡型',
+    sub:'进 退 有 度 · 收 放 自 如',
+    gods:[
+      { id:'xiao',
+        why:'你已经懂得量入为出，钱的进出大体在掌控中。接下来缺的不是「守」，而是「开」——萧升居东属木，木主生发，他管的正是把外面的机会、资源、人脉引到你这儿来。财路宽了，池子才涨得快。' },
+      { id:'chen',
+        why:'但财要流动才活。你的问题常常是「大方向有、执行看心情」。陈九公居南属火，火主流通与热度，主「走动招财、和气来财」——他提醒你：别把钱捂得太死，也别放得太松，让合作、走动、人情替你带财。' }
+    ],
+    advice:[
+      '把「看情况」变成「有规则」：工资到账自动分账，比如 50% 必要开销 / 30% 想要 / 20% 储蓄投资。',
+      '先攒够 3—6 个月生活费的应急金，这笔钱只放在随时能取的地方。',
+      '每季度复盘一次：钱花在哪、哪笔最值、哪笔最后悔——三个月调一次，就够了。'
+    ]
+  },
+  spender: {
+    name:'散财型',
+    sub:'财 气 活 络 · 宜 收 宜 聚',
+    gods:[
+      { id:'yao',
+        why:'你其实不缺财气，缺的是「留」。姚少司居北属水，水主流动与节奏，他主利市交易、细水长流——先把进出的节奏稳住，钱才有机会慢慢留下来。' },
+      { id:'cao',
+        why:'你最大的漏洞，是钱在你手上待不住。曹宝居西属金，金主收敛，正是替你堵漏的那一位：该收的收回来，该记的记清楚，财库有了门，财神才进得来。' }
+    ],
+    advice:[
+      '先存后花：工资到账当天，自动转 10%—20% 到一个「不方便取」的账户。',
+      '大额消费设 24—72 小时冷静期：想买先加购物车，过了时间还想要，再买。',
+      '停掉分期、最低还款和先用后付，优先还清利息最高的那笔债。'
+    ]
+  }
+};
+
+/* ============================================================
+   财神 SVG 构建 —— 五行配色 + 各自造型与动画
+   ============================================================ */
+
+function buildGodSVG(godId, uid){
+  const g = GODS[godId];
+  const gid = 'grad-' + uid;
+  const hid = 'halo-' + uid;
+
+  const defs = `
+    <defs>
+      <linearGradient id="${gid}" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="${g.light}"/>
+        <stop offset="45%" stop-color="${g.main}"/>
+        <stop offset="100%" stop-color="${g.dark}"/>
+      </linearGradient>
+      <radialGradient id="${hid}">
+        <stop offset="0%" stop-color="${g.main}" stop-opacity="0.34"/>
+        <stop offset="62%" stop-color="${g.main}" stop-opacity="0.09"/>
+        <stop offset="100%" stop-color="${g.main}" stop-opacity="0"/>
+      </radialGradient>
+    </defs>`;
+
+  /* 通用外环 + 光环 */
+  const ring = `
+    <circle cx="60" cy="55" r="46" fill="url(#${hid})" class="halo"/>
+    <circle cx="60" cy="55" r="48" fill="none" stroke="url(#${gid})" stroke-width="1" class="ring"/>`;
+
+  let body = '';
+
+  /* ---------- 东 · 木 · 萧升（清俊 · 进贤冠 · 聚宝盆） ---------- */
+  if (godId === 'xiao'){
+    body = `
+      ${ring.replace('class="ring"', 'class="ring"')}
+
+      <path d="M48 47 Q48 30 60 28 Q72 30 72 47" fill="none" stroke="url(#${gid})" stroke-width="1.4"/>
+      <path d="M48 47 L72 47" stroke="url(#${gid})" stroke-width="1.2"/>
+      <path d="M54 28 L60 20 L66 28" fill="none" stroke="url(#${gid})" stroke-width="1.2" stroke-linejoin="round"/>
+      <circle cx="60" cy="20" r="1.8" fill="url(#${gid})"/>
+
+      <ellipse cx="60" cy="59" rx="14" ry="15.5" fill="rgba(95,184,148,0.07)" stroke="url(#${gid})" stroke-width="1.3"/>
+
+      <path d="M49 53 L56 54" fill="none" stroke="url(#${gid})" stroke-width="1.2" stroke-linecap="round"/>
+      <path d="M71 53 L64 54" fill="none" stroke="url(#${gid})" stroke-width="1.2" stroke-linecap="round"/>
+      <path d="M52 58 Q54 56 56 58" fill="none" stroke="url(#${gid})" stroke-width="1.2" stroke-linecap="round"/>
+      <path d="M64 58 Q66 56 68 58" fill="none" stroke="url(#${gid})" stroke-width="1.2" stroke-linecap="round"/>
+
+      <path d="M56 67 Q60 70 64 67" fill="none" stroke="url(#${gid})" stroke-width="1.1" stroke-linecap="round"/>
+
+      <path d="M36 105 Q40 85 54 83 L60 93 L66 83 Q80 85 84 105" fill="none" stroke="url(#${gid})" stroke-width="1.3" stroke-linejoin="round"/>
+      <path d="M50 86 L60 100 L70 86" fill="none" stroke="url(#${gid})" stroke-width="1" opacity="0.5"/>
+
+      <path d="M48 95 L72 95 L68 107 L52 107 Z" fill="none" stroke="url(#${gid})" stroke-width="1.2" stroke-linejoin="round"/>
+      <path d="M50 95 Q60 89 70 95" fill="none" stroke="url(#${gid})" stroke-width="1"/>
+      <circle cx="60" cy="91" r="2.8" fill="url(#${gid})" opacity="0.7" class="basin-glow"/>
+
+      <circle cx="55" cy="88" r="1.3" fill="${g.main}" opacity="0.6" class="rise"/>
+      <circle cx="60" cy="85" r="1.3" fill="${g.main}" opacity="0.6" class="rise r2"/>
+      <circle cx="65" cy="88" r="1.3" fill="${g.main}" opacity="0.6" class="rise r3"/>
+
+      <path d="M26 104 Q30 100 34 104 Q30 106 26 104 Z" fill="${g.main}" opacity="0.28"/>
+      <path d="M86 104 Q90 100 94 104 Q90 106 86 104 Z" fill="${g.main}" opacity="0.28"/>`;
+  }
+
+  /* ---------- 南 · 火 · 陈九公（笑颜 · 逍遥巾 · 铜钱串） ---------- */
+  else if (godId === 'chen'){
+    body = `
+      ${ring.replace('class="ring"', 'class="ring ring-fast"')}
+
+      <path d="M48 45 Q48 29 60 27 Q72 29 72 45" fill="none" stroke="url(#${gid})" stroke-width="1.4"/>
+      <path d="M48 45 L72 45" stroke="url(#${gid})" stroke-width="1.1"/>
+      <path d="M48 39 Q42 41 40 47" fill="none" stroke="${g.accent}" stroke-width="1.2" stroke-linecap="round"/>
+      <path d="M72 39 Q78 41 80 47" fill="none" stroke="${g.accent}" stroke-width="1.2" stroke-linecap="round"/>
+      <circle cx="60" cy="27" r="2.1" fill="url(#${gid})"/>
+
+      <ellipse cx="60" cy="59" rx="14" ry="15.5" fill="rgba(224,96,74,0.07)" stroke="url(#${gid})" stroke-width="1.3"/>
+
+      <path d="M49 54 Q53 52 56 54" fill="none" stroke="url(#${gid})" stroke-width="1.1" stroke-linecap="round"/>
+      <path d="M71 54 Q67 52 64 54" fill="none" stroke="url(#${gid})" stroke-width="1.1" stroke-linecap="round"/>
+      <path d="M52 59 Q54 61 56 59" fill="none" stroke="url(#${gid})" stroke-width="1.2" stroke-linecap="round"/>
+      <path d="M64 59 Q66 61 68 59" fill="none" stroke="url(#${gid})" stroke-width="1.2" stroke-linecap="round"/>
+
+      <path d="M55 67 Q60 71 65 67" fill="none" stroke="url(#${gid})" stroke-width="1.1" stroke-linecap="round"/>
+
+      <path d="M36 105 Q40 85 54 83 L60 93 L66 83 Q80 85 84 105" fill="none" stroke="url(#${gid})" stroke-width="1.3" stroke-linejoin="round"/>
+      <path d="M50 86 L60 100 L70 86" fill="none" stroke="url(#${gid})" stroke-width="1" opacity="0.5"/>
+
+      <path d="M48 90 L60 94 L72 90" fill="none" stroke="url(#${gid})" stroke-width="0.9" opacity="0.6"/>
+      <g class="coin">
+        <circle cx="48" cy="96" r="5.2" fill="none" stroke="url(#${gid})" stroke-width="1.15"/>
+        <rect x="46.4" y="94.4" width="3.2" height="3.2" fill="none" stroke="url(#${gid})" stroke-width="0.85"/>
+      </g>
+      <g class="coin c2">
+        <circle cx="60" cy="100" r="5.2" fill="none" stroke="url(#${gid})" stroke-width="1.15"/>
+        <rect x="58.4" y="98.4" width="3.2" height="3.2" fill="none" stroke="url(#${gid})" stroke-width="0.85"/>
+      </g>
+      <g class="coin c3">
+        <circle cx="72" cy="96" r="5.2" fill="none" stroke="url(#${gid})" stroke-width="1.15"/>
+        <rect x="70.4" y="94.4" width="3.2" height="3.2" fill="none" stroke="url(#${gid})" stroke-width="0.85"/>
+      </g>
+
+      <path d="M26 108 Q30 104 34 108 Q30 110 26 108 Z" fill="${g.main}" opacity="0.3"/>
+      <path d="M86 108 Q90 104 94 108 Q90 110 86 108 Z" fill="${g.main}" opacity="0.3"/>`;
+  }
+
+  /* ---------- 中 · 土 · 赵公明（武将 · 金鞭 · 虎纹） ---------- */
+  else if (godId === 'zhao'){
+    body = `
+      ${ring.replace('class="ring"', 'class="ring ring-slow"')}
+
+      <path d="M57 17 Q60 6 63 17" fill="none" stroke="${g.accent}" stroke-width="1.6" stroke-linecap="round" class="tassel"/>
+      <circle cx="60" cy="14" r="2.8" fill="url(#${gid})"/>
+
+      <path d="M46 45 Q46 26 60 24 Q74 26 74 45" fill="none" stroke="url(#${gid})" stroke-width="1.5"/>
+      <path d="M60 24 L60 14" stroke="url(#${gid})" stroke-width="1.3"/>
+      <path d="M46 45 L41 57 L48 57" fill="none" stroke="url(#${gid})" stroke-width="1.2" stroke-linejoin="round"/>
+      <path d="M74 45 L79 57 L72 57" fill="none" stroke="url(#${gid})" stroke-width="1.2" stroke-linejoin="round"/>
+
+      <ellipse cx="60" cy="59" rx="15" ry="16" fill="rgba(20,8,2,0.62)" stroke="url(#${gid})" stroke-width="1.3"/>
+
+      <path d="M48 53 Q52 50 56 53" fill="none" stroke="url(#${gid})" stroke-width="1.5" stroke-linecap="round"/>
+      <path d="M72 53 Q68 50 64 53" fill="none" stroke="url(#${gid})" stroke-width="1.5" stroke-linecap="round"/>
+      <circle cx="54" cy="58" r="1.8" fill="url(#${gid})"/>
+      <circle cx="66" cy="58" r="1.8" fill="url(#${gid})"/>
+
+      <path d="M50 67 Q60 81 70 67" fill="none" stroke="url(#${gid})" stroke-width="1.4" stroke-linecap="round"/>
+      <path d="M54 70 Q60 83 66 70" fill="none" stroke="url(#${gid})" stroke-width="1" stroke-linecap="round" opacity="0.7"/>
+
+      <path d="M34 105 Q38 85 52 83 L60 95 L68 83 Q82 85 86 105" fill="none" stroke="url(#${gid})" stroke-width="1.4" stroke-linejoin="round"/>
+      <path d="M56 85 L60 95 L64 85" fill="none" stroke="url(#${gid})" stroke-width="1" opacity="0.6"/>
+
+      <path d="M26 111 Q30 103 36 107" fill="none" stroke="${g.accent}" stroke-width="1.1" opacity="0.5"/>
+      <path d="M84 111 Q90 103 94 107" fill="none" stroke="${g.accent}" stroke-width="1.1" opacity="0.5"/>
+      <path d="M30 114 Q34 108 39 111" fill="none" stroke="${g.accent}" stroke-width="0.85" opacity="0.34"/>
+      <path d="M81 114 Q86 108 90 111" fill="none" stroke="${g.accent}" stroke-width="0.85" opacity="0.34"/>`;
+  }
+
+  /* ---------- 西 · 金 · 曹宝（文官 · 长须 · 托宝珠） ---------- */
+  else if (godId === 'cao'){
+    body = `
+      ${ring.replace('class="ring"', 'class="ring"')}
+
+      <path d="M46 47 Q46 28 60 26 Q74 28 74 47" fill="none" stroke="url(#${gid})" stroke-width="1.4"/>
+      <path d="M46 47 L74 47" stroke="url(#${gid})" stroke-width="1.2"/>
+      <path d="M46 41 Q37 43 33 47" fill="none" stroke="url(#${gid})" stroke-width="1.1" stroke-linecap="round"/>
+      <path d="M74 41 Q83 43 87 47" fill="none" stroke="url(#${gid})" stroke-width="1.1" stroke-linecap="round"/>
+      <circle cx="60" cy="26" r="2.3" fill="url(#${gid})"/>
+
+      <ellipse cx="60" cy="59" rx="14" ry="15.5" fill="rgba(216,216,208,0.07)" stroke="url(#${gid})" stroke-width="1.3"/>
+
+      <path d="M49 53 Q53 51 56 53" fill="none" stroke="url(#${gid})" stroke-width="1.2" stroke-linecap="round"/>
+      <path d="M71 53 Q67 51 64 53" fill="none" stroke="url(#${gid})" stroke-width="1.2" stroke-linecap="round"/>
+      <circle cx="54" cy="58" r="1.5" fill="url(#${gid})"/>
+      <circle cx="66" cy="58" r="1.5" fill="url(#${gid})"/>
+
+      <path d="M55 66 Q56 76 54 84" fill="none" stroke="url(#${gid})" stroke-width="1.1" stroke-linecap="round" opacity="0.85"/>
+      <path d="M65 66 Q64 76 66 84" fill="none" stroke="url(#${gid})" stroke-width="1.1" stroke-linecap="round" opacity="0.85"/>
+      <path d="M60 68 L60 81" fill="none" stroke="url(#${gid})" stroke-width="0.9" opacity="0.6"/>
+
+      <path d="M36 105 Q40 85 54 83 L60 93 L66 83 Q80 85 84 105" fill="none" stroke="url(#${gid})" stroke-width="1.3" stroke-linejoin="round"/>
+      <path d="M50 85 L60 101 L70 85" fill="none" stroke="url(#${gid})" stroke-width="1" opacity="0.5"/>
+
+      <path d="M52 92 Q56 96 60 96 Q64 96 68 92" fill="none" stroke="url(#${gid})" stroke-width="1" opacity="0.7"/>
+      <circle cx="60" cy="104" r="5.4" fill="rgba(216,216,208,0.10)" stroke="url(#${gid})" stroke-width="1.2" class="pearl"/>
+      <circle cx="60" cy="104" r="2.8" fill="url(#${gid})" opacity="0.7" class="pearl-core"/>
+      <path d="M57.5 102 Q59 99.5 61.5 99.8" fill="none" stroke="#FFFFFF" stroke-width="0.85" opacity="0.9"/>`;
+  }
+
+  /* ---------- 北 · 水 · 姚少司（精明 · 方巾 · 算盘） ---------- */
+  else if (godId === 'yao'){
+    body = `
+      ${ring.replace('class="ring"', 'class="ring"')}
+
+      <path d="M48 45 Q48 29 60 27 Q72 29 72 45" fill="none" stroke="url(#${gid})" stroke-width="1.4"/>
+      <path d="M48 45 L72 45" stroke="url(#${gid})" stroke-width="1.1"/>
+      <path d="M54 27 L54 22 L66 22 L66 27" fill="none" stroke="url(#${gid})" stroke-width="1.1" stroke-linejoin="round"/>
+
+      <ellipse cx="60" cy="59" rx="14" ry="15.5" fill="rgba(90,143,208,0.07)" stroke="url(#${gid})" stroke-width="1.3"/>
+
+      <path d="M49 53 L56 55" fill="none" stroke="url(#${gid})" stroke-width="1.1" stroke-linecap="round"/>
+      <path d="M71 53 L64 55" fill="none" stroke="url(#${gid})" stroke-width="1.1" stroke-linecap="round"/>
+      <circle cx="54" cy="59" r="1.5" fill="url(#${gid})"/>
+      <circle cx="66" cy="59" r="1.5" fill="url(#${gid})"/>
+
+      <path d="M54 66 Q58 68 60 66 Q62 68 66 66" fill="none" stroke="url(#${gid})" stroke-width="1" stroke-linecap="round"/>
+
+      <path d="M36 105 Q40 85 54 83 L60 93 L66 83 Q80 85 84 105" fill="none" stroke="url(#${gid})" stroke-width="1.3" stroke-linejoin="round"/>
+      <path d="M50 86 L60 100 L70 86" fill="none" stroke="url(#${gid})" stroke-width="1" opacity="0.5"/>
+
+      <rect x="42" y="93" width="36" height="12" rx="1" fill="none" stroke="url(#${gid})" stroke-width="1.05"/>
+      <line x1="42" y1="99" x2="78" y2="99" stroke="url(#${gid})" stroke-width="0.7"/>
+      <circle cx="48" cy="96" r="1.5" fill="url(#${gid})" class="bead"/>
+      <circle cx="54" cy="96" r="1.5" fill="url(#${gid})" class="bead b2"/>
+      <circle cx="60" cy="96" r="1.5" fill="url(#${gid})" class="bead b3"/>
+      <circle cx="66" cy="96" r="1.5" fill="url(#${gid})" class="bead b4"/>
+      <circle cx="72" cy="96" r="1.5" fill="url(#${gid})" class="bead b5"/>
+      <circle cx="48" cy="102" r="1.5" fill="url(#${gid})" class="bead b6"/>
+      <circle cx="54" cy="102" r="1.5" fill="url(#${gid})" class="bead b7"/>
+      <circle cx="60" cy="102" r="1.5" fill="url(#${gid})" class="bead b8"/>
+      <circle cx="66" cy="102" r="1.5" fill="url(#${gid})" class="bead b9"/>
+      <circle cx="72" cy="102" r="1.5" fill="url(#${gid})" class="bead b10"/>
+
+      <circle cx="30" cy="86" r="1" fill="${g.main}" class="sparkle"/>
+      <circle cx="92" cy="80" r="1" fill="${g.main}" class="sparkle s2"/>
+      <circle cx="88" cy="96" r="1" fill="${g.main}" class="sparkle s3"/>`;
+  }
+
+  return `<svg class="god-svg" viewBox="0 0 120 130" aria-hidden="true">${defs}${body}</svg>`;
+}
+
+/* ============================================================
+   逻辑层
+   ============================================================ */
+
+let idx = 0;
+let picks = [];
+
+/* 开始页五路财神（按东→南→中→西→北） */
+document.getElementById('god-row').innerHTML =
+  GOD_ORDER.map((key, i) => {
+    const g = GODS[key];
+    return `
+      <div class="god-chip">
+        ${buildGodSVG(key, 'start' + i)}
+        <div class="chip-line" style="background:${g.main}"></div>
+        <span class="chip-el">${g.dir} · ${g.element}</span>
+        <span class="chip-name">${g.name}</span>
+      </div>`;
+  }).join('');
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+
+function startQuiz(){
+  idx = 0;
+  picks = [];
+  showScreen('screen-quiz');
+  renderQuestion();
+}
+
+function renderQuestion(){
+  const q = QUESTIONS[idx];
+  document.getElementById('q-index').textContent = `第 ${idx + 1} / ${QUESTIONS.length} 题`;
+  document.getElementById('progress-fill').style.width =
+    ((idx + 1) / QUESTIONS.length * 100) + '%';
+  document.getElementById('q-text').textContent = q.q;
+
+  const box = document.getElementById('options');
+  box.innerHTML = '';
+  q.opts.forEach((o, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    btn.dataset.label = ['A','B','C'][i];
+    btn.textContent = o.t;
+    if (picks[idx] === i) btn.classList.add('chosen');
+    btn.onclick = () => choose(i, btn);
+    box.appendChild(btn);
+  });
+
+  document.getElementById('btn-back').disabled = (idx === 0);
+}
+
+function choose(i, btn){
+  picks[idx] = i;
+  document.querySelectorAll('.option').forEach(el => el.classList.remove('chosen'));
+  btn.classList.add('chosen');
+  setTimeout(() => {
+    if (idx < QUESTIONS.length - 1){
+      idx++;
+      renderQuestion();
+    } else {
+      showResult();
+    }
+  }, 340);
+}
+
+function prevQuestion(){
+  if (idx > 0){ idx--; renderQuestion(); }
+}
+
+function showResult(){
+  const score = picks.reduce((sum, choice, i) => {
+    return sum + QUESTIONS[i].opts[choice].s;
+  }, 0);
+
+  let res;
+  if (score >= 16)      res = RESULTS.keeper;
+  else if (score >= 9)  res = RESULTS.balanced;
+  else                  res = RESULTS.spender;
+
+  document.getElementById('result-name').textContent = res.name;
+  document.getElementById('result-sub').textContent  = res.sub;
+  document.getElementById('score-line').textContent  = `财运得分 ${score} / 20`;
+
+  document.getElementById('god-cards').innerHTML = res.gods.map((item, i) => {
+    const g = GODS[item.id];
+    return `
+      <div class="god-card" style="
+        border:1px solid ${g.main}59;
+        background:linear-gradient(135deg,${g.main}1A,rgba(120,22,22,.06) 60%,${g.main}08);
+        --gc-soft:${g.main}22;
+      ">
+        ${buildGodSVG(item.id, 'res' + i)}
+        <div class="g-body">
+          <div class="g-name-row">
+            <span class="g-name gold-text">${g.name}</span>
+            <span class="g-el" style="color:${g.main};border-color:${g.main}80">${g.dir} · ${g.element}</span>
+          </div>
+          <div class="g-title">${g.title}</div>
+          <div class="g-power">${g.power}</div>
+          <div class="g-why">${item.why}</div>
+        </div>
+      </div>`;
+  }).join('');
+
+  document.getElementById('advice-list').innerHTML =
+    res.advice.map(a => `<li>${a}</li>`).join('');
+
+  showScreen('screen-result');
+}
+
+function restart(){
+  idx = 0;
+  picks = [];
+  showScreen('screen-start');
+}
+</script>
+</body>
+</html>
